@@ -1,0 +1,241 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Data;
+using System.Data.OleDb;
+using Domen;
+
+namespace Sesija
+{
+    public class Broker
+    {
+        private static Broker instanca;
+        private OleDbConnection konekcija;
+        private OleDbCommand komanda;
+        private Broker()
+        {
+            this.konekcija = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\TrecaBGD\Documents\Database16.accdb");
+            this.komanda = konekcija.CreateCommand();
+
+        }
+        public static Broker DajSesiju()
+        {
+            if (instanca == null)
+            {
+                instanca = new Broker();
+            }
+            return instanca;
+        }
+        public List<Mesto> VratiSvaMesta()
+        {
+            List<Mesto> mesta = new List<Mesto>();
+            try
+            {
+                komanda.CommandText = "select PttBroj, Naziv from Mesto";
+                komanda.CommandType = CommandType.Text;
+                konekcija.Open();
+                OleDbDataReader citac = komanda.ExecuteReader();
+                while (citac.Read())
+                {
+                    Mesto mesto = new Mesto
+                    {
+                        PttBroj = (int)citac["PttBroj"],
+                        Naziv = citac["Naziv"].ToString()
+                    };
+                    mesta.Add(mesto);
+
+                }
+                return mesta;
+            }
+
+            finally
+            {
+                if (konekcija != null)
+                {
+                    konekcija.Close();
+
+                }
+
+            }
+        }
+        public int UbaciMestouBazu(Mesto m)
+        {
+            try
+            {
+                komanda.CommandText = String.Format("insert into Mesto values({0},'{1}')", m.PttBroj, m.Naziv);
+                komanda.CommandType = CommandType.Text;
+                konekcija.Open();
+                return komanda.ExecuteNonQuery();
+
+            }
+            finally
+            {
+                if (konekcija != null)
+                {
+                    konekcija.Close();
+                }
+
+            }
+        }
+        public int UbaciOsobu_uBazu(Osoba o)
+        {
+            try
+            {
+                komanda.CommandText = String.Format("insert into Osoba values('{0}','{1}',{2})", o.Jmbg, o.ImePrezime, o.Mesto.PttBroj);
+                komanda.CommandType = CommandType.Text;
+                konekcija.Open();
+                return komanda.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+
+            }
+            finally
+            {
+                if (konekcija != null)
+                {
+                    konekcija.Close();
+                }
+
+            }
+        }
+        public List<Osoba> VratiSveOsobe()
+        {
+            List<Osoba> osoba = new List<Osoba>();
+            try
+            {
+                komanda.CommandText = "select Osoba.Jmbg, Osoba.ImePrezime, Mesto.Naziv, Mesto.PttBroj from Osoba inner join Mesto on Osoba.Mesto=Mesto.PttBroj";
+                komanda.CommandType = CommandType.Text;
+                konekcija.Open();
+                OleDbDataReader citac = komanda.ExecuteReader();
+                while (citac.Read())
+                {
+                    Mesto m = new Mesto
+                    {
+                        PttBroj = (int)citac["PttBroj"],
+                        Naziv = citac["Naziv"].ToString()
+                    };
+                    Osoba o = new Osoba
+                    {
+                        Jmbg = citac["Jmbg"].ToString(),
+                        ImePrezime = citac["ImePrezime"].ToString(),
+                    };
+                    o.Mesto = m;
+                    osoba.Add(o);
+
+                }
+                return osoba;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            finally
+            {
+                if (konekcija != null)
+                {
+                    konekcija.Close();
+
+                }
+
+            }
+        }
+         public List<Proizvod> VratiSveProizvode()
+        {
+            List<Proizvod> proizvod = new List<Proizvod>();
+            try
+            {
+                komanda.CommandText = "select Sifra,Naziv,Cena from Proizvod";
+                komanda.CommandType = CommandType.Text;
+                konekcija.Open();
+                OleDbDataReader citac = komanda.ExecuteReader();
+                while (citac.Read())
+                {
+                    
+                    Proizvod p = new Proizvod
+                    {
+                        Sifra = Convert.ToInt32(citac["Sifra"]),
+                        Naziv = citac["Naziv"].ToString(),
+                        Cena=Convert.ToDouble(citac["Cena"])
+                    };
+                   
+                    proizvod.Add(p);
+
+                }
+                return proizvod;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            finally
+            {
+                if (konekcija != null)
+                {
+                    konekcija.Close();
+
+                }
+            }
+        }
+        public int UbaciProizvod(Proizvod p)
+        {
+            try
+            {
+                 komanda.CommandText = "insert into Proizvod(Naziv,Cena) values('"+p.Naziv+"' ,"+ p.Cena + ")";
+                komanda.CommandType = CommandType.Text;
+                konekcija.Open();
+                return komanda.ExecuteNonQuery();
+                
+
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+                
+            }
+            finally
+            {
+                if (konekcija !=null)
+                {
+                    konekcija.Close();
+                }
+            }
+        }
+        public int IzmeniProizvod(Proizvod p)
+        {
+            try
+            {
+                komanda.CommandText = "Update Proizvod Set Naziv='"+p.Naziv+"',Cena="+p.Cena+" Where Sifra="+p.Sifra+"";
+                komanda.CommandType = CommandType.Text;
+                konekcija.Open();
+                return komanda.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (konekcija != null)
+                {
+                    konekcija.Close();
+                }
+            }
+        }
+
+
+
+
+    }
+
+
+
+    }
+

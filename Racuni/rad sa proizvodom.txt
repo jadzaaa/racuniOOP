@@ -1,0 +1,155 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using Sesija;
+using Domen;
+
+namespace Forme
+{
+    public partial class RadSaProizvodom : Form
+    {
+        public RadSaProizvodom()
+        {
+            InitializeComponent();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+             
+            if(String.IsNullOrWhiteSpace(txtnaziv.Text))
+            {
+                MessageBox.Show("Unesite naziv proizvoda!!!");
+                txtnaziv.Focus();
+                return;
+            }
+            if (String.IsNullOrWhiteSpace(txtcena.Text))
+            {
+                MessageBox.Show("Unesite cenu proizvoda!!!");
+                txtcena.Focus();
+                return;
+            }
+            double cena1;
+            if(!double.TryParse(txtcena.Text,out cena1))
+            {
+                MessageBox.Show("Unesite numericki podatak!!!");
+                txtcena.Clear();
+                txtcena.Focus();
+                return;
+            }
+            {
+
+            }
+            if (gbproizvod.Text == "Rad sa proizvodom")
+            {
+                
+                string naziv = txtnaziv.Text;
+                double cena = Convert.ToDouble(txtcena.Text);
+                Proizvod proizvod = new Proizvod
+                {
+                    
+                    Naziv = naziv,
+                    Cena = cena
+                };
+                try
+                {
+                    int rezultat = Broker.DajSesiju().UbaciProizvod(proizvod);
+                    if (rezultat > 0)
+                    {
+                        MessageBox.Show("Uspesno ste dodali proizvod!!!");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Niste uspesno dodali proizvod!!!");
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Postoji problem!!!", ex.Message);
+                }
+            }
+            if(gbproizvod.Text=="Izmeni proizvod" && dgvproizvod.SelectedRows.Count>0)
+            {
+                string naziv = txtnaziv.Text;
+                double cena = Convert.ToDouble(txtcena.Text);
+                Proizvod proizvod = new Proizvod
+                {
+                    Naziv = naziv,
+                    Cena = cena,
+                    Sifra = int.Parse(dgvproizvod.SelectedRows[0].Cells[0].Value.ToString())
+                };
+                try
+                {
+                    int rezultat = Broker.DajSesiju().IzmeniProizvod(proizvod);
+                    if (rezultat > 0)
+                    {
+                        MessageBox.Show("Uspesno ste promenili proizvod!!!");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Niste uspesno promenili proizvod!!!");
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Postoji problem!!!", ex.Message);
+                }
+
+
+            }
+            dgvproizvod.DataSource = null;
+            dgvproizvod.DataSource = Broker.DajSesiju().VratiSveProizvode();
+            Resetuj();
+        }
+        private void Resetuj()
+        {
+            txtcena.Clear();
+            txtnaziv.Clear();
+            btnproizvod.Text = "Dodaj Proizvod";
+            gbproizvod.Text = "Rad sa proizvodima";
+            dgvproizvod.ClearSelection();
+        }
+
+
+        
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void RadSaProizvodom_Load(object sender, EventArgs e)
+        {
+            dgvproizvod.DataSource = Broker.DajSesiju().VratiSveProizvode();
+            dgvproizvod.SelectionChanged += dgvproizvod_SelectionChanged;
+        }
+
+        private void dgvproizvod_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dgvproizvod.SelectedRows.Count > 0)
+            {
+                Proizvod proizvod = (Proizvod)dgvproizvod.SelectedRows[0].DataBoundItem;
+                gbproizvod.Text = "Izmeni proizvod";
+                btnproizvod.Text = "Izmeni";
+                txtcena.Text = proizvod.Cena.ToString();
+                txtnaziv.Text = proizvod.Naziv;
+            }
+
+
+        }
+
+        private void btnreset_Click(object sender, EventArgs e)
+        {
+            Resetuj();
+            txtnaziv.Focus();
+
+        }
+    }
+}

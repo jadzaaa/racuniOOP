@@ -1,0 +1,40 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using Domen;
+
+namespace Forme
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void mestoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            RadSaMestom m= new RadSaMestom();
+            m.ShowDialog();
+        }
+
+        private void osobaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            RadSaOsobom o= new RadSaOsobom();
+            o.ShowDialog();
+
+        }
+
+        private void proizvodToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            RadSaProizvodom p = new RadSaProizvodom();
+            p.ShowDialog();
+        }
+    }
+}

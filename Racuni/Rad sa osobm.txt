@@ -1,0 +1,77 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using Sesija;
+using Domen;
+namespace Forme
+{
+    public partial class RadSaOsobom : Form
+    {
+        public RadSaOsobom()
+        {
+            InitializeComponent();
+        }
+
+        private void btnunos_Click(object sender, EventArgs e)
+        {
+            string jmbg = txtjmbg.Text;
+            string Imeprezime = txtimeiprezime.Text;
+
+            Osoba o = new Osoba
+            {
+                Jmbg = jmbg,
+                ImePrezime = Imeprezime,
+                Mesto = cmbmesto.SelectedItem as Mesto
+            };
+            try
+            {
+                int rezultat = Broker.DajSesiju().UbaciOsobu_uBazu(o);
+                if (rezultat > 0)
+                {
+                    MessageBox.Show("Uspesno ste dodali osobu!!!");
+                }
+                else
+                {
+                    MessageBox.Show("Niste uspesno dodali osobu!!!");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Vec postoji ta osoba u bazi!!!" + ex.Message);
+            }
+            dgvosoba.DataSource = Broker.DajSesiju().VratiSveOsobe();
+
+        }
+
+        private void dgvosoba_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void RadSaOsobom_Load(object sender, EventArgs e)
+        {
+            dgvosoba.DataSource = Broker.DajSesiju().VratiSveOsobe();
+            cmbmesto.DataSource = Broker.DajSesiju().VratiSvaMesta();
+
+        }
+
+        private void btnnazad_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void cmbmesto_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        
+    }
+}

@@ -1,0 +1,24 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.ComponentModel;
+
+namespace Domen
+{
+    public class Osoba
+    {
+        [Browsable(false)]
+        public string Jmbg { get; set; }
+        [DisplayName("Ime i prezime")]
+        public string ImePrezime { get; set; }
+        public Mesto Mesto { get; set; }
+        public override string ToString()
+        {
+            return String.Format("{0} {1}", ImePrezime, Mesto);
+
+        }
+
+    }
+}

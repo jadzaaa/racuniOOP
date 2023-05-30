@@ -1,0 +1,55 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using Domen;
+using Sesija;
+
+namespace Forme
+{
+    public partial class RadSaMestom : Form
+    {
+        public RadSaMestom()
+        {
+            InitializeComponent();
+        }
+
+        private void RadSaMestom_Load(object sender, EventArgs e)
+        {
+            dgvmesto.DataSource = Broker.DajSesiju().VratiSvaMesta();
+
+        }
+
+        private void btnunesi_Click(object sender, EventArgs e)
+        {
+            int pb = int.Parse(txtpttbroj.Text);
+            string n = txtnaziv.Text;
+            Mesto m = new Mesto
+            {
+                PttBroj = pb,
+                Naziv = n
+            };
+            try
+            {
+                Broker.DajSesiju().UbaciMestouBazu(m);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            txtnaziv.Clear();
+            txtpttbroj.Clear();
+            dgvmesto.DataSource = Broker.DajSesiju().VratiSvaMesta();
+        }
+
+        private void btnnazad_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+    }
+}
